@@ -9,6 +9,9 @@
 #include "route_planner.h"
 
 using namespace std::experimental;
+using std::cin;
+using std::endl;
+using std::cout;
 
 static std::optional<std::vector<std::byte>> ReadFile(const std::string &path)
 {
@@ -30,6 +33,30 @@ static std::optional<std::vector<std::byte>> ReadFile(const std::string &path)
 
     // move allows to use the content of the vector to another variable without using pointer or references
     return std::move(contents);
+}
+
+static std::vector<float> getInputCoords()
+{
+    std::vector<float> ret;
+    float input;
+
+    std::cout << "Enter start points:" << endl;
+    std::cout << "x: ";
+    cin >> input;
+    ret.push_back(input);
+    std::cout << "y: ";
+    cin >> input;
+    ret.push_back(input);
+
+    std::cout << "Enter end points:" << endl;
+    std::cout << "x: ";
+    cin >> input;
+    ret.push_back(input);
+    std::cout << "y: ";
+    cin >> input;
+    ret.push_back(input);
+
+    return ret;
 }
 
 int main(int argc, const char **argv)
@@ -57,9 +84,10 @@ int main(int argc, const char **argv)
             osm_data = std::move(*data);
     }
 
-    // TODO 1: Declare floats `start_x`, `start_y`, `end_x`, and `end_y` and get
-    // user input for these values using std::cin. Pass the user input to the
-    // RoutePlanner object below in place of 10, 10, 90, 90.
+    std::vector<float> coords = getInputCoords();
+
+    cout << "Start Points: (" << coords[0] << "," << coords[1] << ")" << endl;
+    cout << "End Points: (" << coords[2] << "," << coords[3] << ")" << endl;
 
     // Build Model.
     RouteModel model{osm_data};
@@ -67,7 +95,7 @@ int main(int argc, const char **argv)
     // Create RoutePlanner object and perform A* search.
 
     // FBL: First two coordinates (x,y) of origin and last two coordinates (x,y) of end point
-    RoutePlanner route_planner{model, 10, 10, 90, 90};
+    RoutePlanner route_planner{model, coords[0], coords[1], coords[2], coords[3]};
     // FBL: record the results of the A* star search
     route_planner.AStarSearch();
 
