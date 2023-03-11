@@ -94,9 +94,8 @@ int main(int argc, const char **argv)
 
     // Create RoutePlanner object and perform A* search.
 
-    // FBL: First two coordinates (x,y) of origin and last two coordinates (x,y) of end point
     RoutePlanner route_planner{model, coords[0], coords[1], coords[2], coords[3]};
-    // FBL: record the results of the A* star search
+
     route_planner.AStarSearch();
 
     std::cout << "Distance: " << route_planner.GetDistance() << " meters. \n";

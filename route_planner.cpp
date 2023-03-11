@@ -25,7 +25,7 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
     {
         node->parent = current_node;
         node->h_value = this->CalculateHValue(node);
-        node->g_value += node->distance(*(this->start_node));
+        node->g_value = current_node->g_value + node->distance(*current_node);
 
         if(!(node->visited))
         {
@@ -34,14 +34,6 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
         }
     }
 }
-
-
-// TODO 5: Complete the NextNode method to sort the open list and return the next node.
-// Tips:
-// - Sort the open_list according to the sum of the h value and g value.
-
-// - Remove that node from the open_list.
-// - Return the pointer.
 
 static bool compare(RouteModel::Node *node1, RouteModel::Node *node2)
 {
@@ -54,10 +46,9 @@ static bool compare(RouteModel::Node *node1, RouteModel::Node *node2)
 RouteModel::Node *RoutePlanner::NextNode() {
     // Sort the open list to have the lowest value at the end of the list
     sort(this->open_list.begin(), this->open_list.end(), compare);
-    auto sizeOfList = (this->open_list).size();
 
     // Create a pointer to the node in the list with the lowest sum.
-    RouteModel::Node *next = (this->open_list)[sizeOfList - 1];
+    RouteModel::Node *next = (this->open_list).back();
 
     // Remove the last element
     (this->open_list).pop_back();
@@ -70,7 +61,6 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     // Create path_found vector
     distance = 0.0f;
     std::vector<RouteModel::Node> path_found;
-
     while(current_node->parent != nullptr)
     {
         path_found.emplace_back(*current_node);
@@ -99,6 +89,21 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 void RoutePlanner::AStarSearch() {
     RouteModel::Node *current_node = nullptr;
 
-    // TODO: Implement your solution here.
+    this->start_node->visited = true;
+    this->start_node->h_value = this->CalculateHValue(this->start_node);
+    this->start_node->g_value = 0;
+    this->AddNeighbors(this->start_node);
+
+     while((this->open_list).size() > 0)
+    {
+        current_node = this->NextNode();
+        this->AddNeighbors(current_node);
+        if (current_node == end_node)
+        {
+            this->m_Model.path = this->ConstructFinalPath(current_node);
+            break;
+        }
+
+    }
 
 }
