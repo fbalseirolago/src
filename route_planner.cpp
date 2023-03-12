@@ -1,6 +1,8 @@
 #include "route_planner.h"
 #include <algorithm>
 #include <iostream>
+
+
 RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, float end_x, float end_y): m_Model(model) {
     // Convert inputs to percentage:
     start_x *= 0.01;
@@ -27,6 +29,7 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
         node->h_value = this->CalculateHValue(node);
         node->g_value = current_node->g_value + node->distance(*current_node);
 
+        // Only add those nodes that have not been visited to be potentially analyzed later
         if(!(node->visited))
         {
             node->visited = true;
@@ -61,6 +64,8 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     // Create path_found vector
     distance = 0.0f;
     std::vector<RouteModel::Node> path_found;
+
+    // If there is no parent to the node this means that it is the start node
     while(current_node->parent != nullptr)
     {
         path_found.emplace_back(*current_node);
@@ -78,32 +83,28 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 
 }
 
-
-// TODO 7: Write the A* Search algorithm here.
-// Tips:
-// - Use the AddNeighbors method to add all of the neighbors of the current node to the open_list.
-// - Use the NextNode() method to sort the open_list and return the next node.
-// - When the search has reached the end_node, use the ConstructFinalPath method to return the final path that was found.
-// - Store the final path in the m_Model.path attribute before the method exits. This path will then be displayed on the map tile.
-
 void RoutePlanner::AStarSearch() {
     RouteModel::Node *current_node = nullptr;
 
+    // Configure the start node accordingly
     this->start_node->visited = true;
     this->start_node->h_value = this->CalculateHValue(this->start_node);
-    this->start_node->g_value = 0;
+    // Fill the open list for the first time with the start node
     this->AddNeighbors(this->start_node);
-
      while((this->open_list).size() > 0)
     {
+
+        // Get the next node with lowest g + h
         current_node = this->NextNode();
-        this->AddNeighbors(current_node);
-        if (current_node == end_node)
+
+        // Both current node and end node are located in the same address
+        if (current_node == this->end_node)
         {
             this->m_Model.path = this->ConstructFinalPath(current_node);
             break;
         }
 
+        this->AddNeighbors(current_node);
     }
 
 }
